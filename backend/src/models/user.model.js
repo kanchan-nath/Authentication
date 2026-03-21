@@ -26,7 +26,8 @@ const userShema = new mongoose.Schema({
     password: {
         type: String,
         required: true,
-        minlength: [3, "Password should more than 3 characters"]
+        minlength: [3, "Password should more than 3 characters"],
+        select:false
     },
     createdAt: {
         type: Date,
@@ -34,14 +35,14 @@ const userShema = new mongoose.Schema({
     refreshToken: {
         type: String,
         expires: process.env.REFRESH_TOKEN_EXPIRY,
+        select:false,
     }
 }, { timestamps: true })
 
 userShema.pre("save", async function(next){
-    if(!this.isModified("password")) return next()
+    if(!this.isModified("password")) return
 
-    this.password = await bcrypt.hash(this.password, process.env.SALT_ROUND)
-    next()
+    this.password = await bcrypt.hash(this.password, 10)
 })
 
 userShema.methods.isPasswordCorrect = async function(password){
@@ -74,4 +75,4 @@ userShema.methods.generateAccessToken = function () {
     )
     return token
 }
-export const Uesr = mongoose.model("User", userShema)
+export const User = mongoose.model("User", userShema)

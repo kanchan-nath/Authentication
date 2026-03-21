@@ -21,4 +21,23 @@ class ApiError extends Error {
     }
 }
 
-export { ApiError }
+class ApiResponse {
+    constructor(statusCode, data, message = "Success") {
+        this.statusCode = statusCode
+        this.data = data
+        this.message = message
+        this.success = statusCode < 400
+    }
+}
+
+const asyncHandler = (fn) => async (req, res, next) => {
+    try {
+        await fn(req, res, next)
+    } catch (error) {
+        console.error("mongoDB connection failed !!!", error)
+        process.exit(1)
+    }
+}
+
+
+export { ApiError, ApiResponse, asyncHandler }
